@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codingdojo.redbelt.services.IdeaService;
+import com.codingdojo.dashboard.models.Subscription;
 import com.codingdojo.redbelt.models.Idea;
 import com.codingdojo.redbelt.models.User;
 import com.codingdojo.redbelt.services.UserService;
@@ -118,18 +119,7 @@ public class UserController {
     	return "create";
     }
     
-	@PostMapping("/create")
-	public String create(@Valid @ModelAttribute("idea")Idea idea, BindingResult res, Model model, HttpSession session) {
 
-		
-		if(res.hasErrors()) return "create";
-
-		idea.setUser(uS.findById((Long)session.getAttribute("user")));
-		
-		
-		iS.create(idea);
-		return "redirect:/users/dashboard";
-	}
 	
 	@GetMapping("/ideas/{idea_id}")
 	public String displayIdea(@PathVariable("idea_id") Long idea_id, Model model, HttpSession session){
@@ -148,14 +138,57 @@ public class UserController {
 		return "edit";
 	}
 	
-	@PostMapping("/update/{idea_id}")
-	public String update(@Valid @ModelAttribute("newIdea") Idea newIdea, @PathVariable("idea_id") Long ideaId, BindingResult result, HttpSession session) {
-		Idea tempIdea = iS.findById(ideaId);
-		tempIdea.setName(newIdea.getName());
-		tempIdea.setUser(uS.findById((Long)session.getAttribute("user")));
-		iS.update(tempIdea);
+	@PostMapping("/create")
+	public String create(@Valid @ModelAttribute("idea")Idea idea, BindingResult res, Model model, HttpSession session) {
+
+		
+		if(res.hasErrors()) return "create";
+
+		idea.setUser(uS.findById((Long)session.getAttribute("user")));
+		
+		
+		iS.create(idea);
 		return "redirect:/users/dashboard";
 	}
+	
+	
+	@PostMapping("/update/{id}")
+	public String update(@Valid @ModelAttribute("idea") Idea idea, BindingResult result, HttpSession session) {
+		
+		if (result.hasErrors()) {
+			return "edit";
+		} else {
+			idea.setUser(uS.findById((Long)session.getAttribute("user")));
+			iS.update(idea);
+			return "redirect:/users/dashboard";
+		}
+	}
+	
+//	@PostMapping("/update/{idea_id}")
+//	public String update(@Valid @ModelAttribute("idea") Idea idea, @PathVariable("idea_id") Long ideaId,  BindingResult res, Model model, HttpSession session) {
+//		
+//		if(res.hasErrors()) return "edit";
+//		
+//		Idea exists = iS.findName(idea.getName());
+//		Idea tempIdea = iS.findById(ideaId);
+//		
+//		if(exists != null) {
+//			model.addAttribute("ideaError", "enter a new idea");
+//			model.addAttribute("idea", idea);
+//			return "edit";
+//		}		
+//		if(tempIdea.getName().length() < 1) {
+//			model.addAttribute("ideaError", "enter a idea with a length of 1 character or more");
+//			model.addAttribute("idea", idea);
+//			return "edit";
+//		} else {
+//			tempIdea.setName(idea.getName());
+//			
+//			tempIdea.setUser(uS.findById((Long)session.getAttribute("user")));
+//			iS.update(tempIdea);
+//			return "redirect:/users/dashboard";
+//	}
+//}
 	
 	@PostMapping ("{id}/destroy")
 	public String delete(@PathVariable("id")Long id) {

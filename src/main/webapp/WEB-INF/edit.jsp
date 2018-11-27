@@ -14,7 +14,9 @@
 		
 		
 		<form:form action="/users/update/${idea.id}" method="POST" modelAttribute="idea">
-    
+        <c:if test="${ideaError != null}">
+        <p class="error"> ${ideaError}</p> 
+        </c:if>
         <p><form:label path="name"> Content: </form:label></p>
 		<p><form:errors path="name"></form:errors> </p>
         <p><form:input path="name"></form:input></p>
